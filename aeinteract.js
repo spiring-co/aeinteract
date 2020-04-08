@@ -45,7 +45,6 @@ const getStructure = (filePath) =>
       app.purge(PurgeTarget.ALL_CACHES);
       return { comps, textLayers, imageLayers };
     }, filePath)
-    .catch(console.log);
+    .catch(console.error);
 
-getStructure("~/Desktop/myFile.aep").then(console.log).catch(console.error);
 module.exports = { getStructure };
