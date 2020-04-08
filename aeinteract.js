@@ -12,7 +12,10 @@ ae.options.includes = [
 
 const getStructure = (filePath) =>
   ae.execute((fp) => {
-    app.open(new File(fp));
+    // don't open file if already loaded
+    if (!(app.project.file && app.project.file.toString().includes(fp)))
+      app.open(new File(fp));
+
     const comps = [];
     const textLayers = [];
 
@@ -22,4 +25,10 @@ const getStructure = (filePath) =>
     return { comps, textLayers };
   }, filePath);
 
+const sandBox = async (fp) => {
+  return ae.execute((fp) => {
+    return console.log(app.project.file.toString());
+  }, fp);
+};
+getStructure("~/Desktop/myFile.aep").then(console.log).catch(console.error);
 module.exports = { getStructure };
