@@ -12,7 +12,7 @@ ae.options.includes = [
 /**
  * @param  {String} filePath - path of aep or aepx file
  */
-const getStructure = (filePath) =>
+const getProjectStructure = (filePath) =>
   ae
     .execute((fp) => {
       // don't open file if already loaded
@@ -20,31 +20,51 @@ const getStructure = (filePath) =>
         app.open(new File(fp));
 
       const comps = [];
-      const textLayers = [];
-      const imageLayers = [];
-
       get(CompItem).each((x) => comps.push(x.name.trim()));
-      get(TextLayer).each((t) => {
-        const ti = {};
-        ti["name"] = t.name.trim();
-        ti["text"] = t.property("Source Text").value.toString().trim();
-        console.log(ti.name, ti.text);
-        textLayers.push(ti);
-      });
-      get(FootageItem).each((f) => {
-        const fi = {};
-        if (f.mainSource.isStill) {
-          fi["name"] = f.name.trim();
-          fi["height"] = f.height;
-          fi["width"] = f.width;
-          imageLayers.push(fi);
-        }
-      });
+      get(CompItem).each((x) => console.log(x.id));
+
+      function getCompStructure(compName) {
+        console.log(compName);
+        const textLayers = [];
+        const imageLayers = [];
+        get
+          .comps(compName)
+          .children(TextLayer)
+          .each((t) => {
+            const ti = {};
+            ti["name"] = t.name.trim();
+            ti["text"] = t.property("Source Text").value.text.trim();
+            ti["font"] = t.property("Source Text").value.font;
+            textLayers.push(ti);
+          });
+
+        get
+          .comps(compName)
+          .children(FootageItem)
+          .each((f) => {
+            const fi = {};
+            if (f.mainSource.isStill) {
+              fi["name"] = f.name.trim();
+              fi["height"] = f.height;
+              fi["width"] = f.width;
+              imageLayers.push(fi);
+            }
+          });
+        return { textLayers, imageLayers };
+      }
 
       //purge memory
       app.purge(PurgeTarget.ALL_CACHES);
-      return { comps, textLayers, imageLayers };
+
+      result = {};
+      comps.map((c) => {
+        result[c] = getCompStructure(c);
+      });
+      return result;
     }, filePath)
     .catch(console.error);
 
-module.exports = { getStructure };
+getProjectStructure("~/Desktop/myFile.aep").then((c) => {
+  console.log(JSON.stringify(c));
+});
+module.exports = { getProjectStructure };
