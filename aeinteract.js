@@ -20,37 +20,43 @@ const getProjectStructure = (filePath) =>
         app.open(new File(fp));
 
       const comps = [];
-      get(CompItem).each((x) => comps.push(x.name.trim()));
-      get(CompItem).each((x) => console.log(x.id));
-
+      get(CompItem).each((x) => comps.push(x.name));
       function getCompStructure(compName) {
-        console.log(compName);
         const textLayers = [];
         const imageLayers = [];
-        get
-          .comps(compName)
-          .children(TextLayer)
-          .each((t) => {
-            const ti = {};
-            ti["name"] = t.name.trim();
-            ti["text"] = t.property("Source Text").value.text.trim();
-            ti["font"] = t.property("Source Text").value.font;
-            textLayers.push(ti);
-          });
-
-        get
-          .comps(compName)
-          .children(FootageItem)
-          .each((f) => {
-            const fi = {};
-            if (f.mainSource.isStill) {
-              fi["name"] = f.name.trim();
-              fi["height"] = f.height;
-              fi["width"] = f.width;
-              imageLayers.push(fi);
+        const comps = {};
+        get(
+          [AVLayer, TextLayer],
+          get(CompItem, compName).selection(0).layers
+        ).each((x) => {
+          const item = {};
+          if (x.source && x.source.constructor === CompItem) {
+            console.log("This is composition");
+            comps[x.name] = getCompStructure(x.name);
+          } else {
+            if (x.constructor === AVLayer) {
+              console.log("This is AV Layer");
+              if (x.source.mainSource.isStill) {
+                console.log("This is Image");
+                item["name"] = x.name.trim();
+                item["height"] = x.height;
+                item["width"] = x.width;
+                imageLayers.push(item);
+              } else {
+                console.log("This is Video");
+              }
+              console.log(x.name);
+            } else if (x.constructor === TextLayer) {
+              console.log("This is TextLayer");
+              const item = {};
+              item["name"] = x.name.trim();
+              item["text"] = x.property("Source Text").value.text.trim();
+              item["font"] = x.property("Source Text").value.font;
+              textLayers.push(item);
             }
-          });
-        return { textLayers, imageLayers };
+          }
+        });
+        return { textLayers, imageLayers, comps };
       }
 
       //purge memory
@@ -60,11 +66,13 @@ const getProjectStructure = (filePath) =>
       comps.map((c) => {
         result[c] = getCompStructure(c);
       });
+
       return result;
     }, filePath)
     .catch(console.error);
 
-getProjectStructure("~/Desktop/myFile.aep").then((c) => {
-  console.log(JSON.stringify(c));
-});
+const x = getProjectStructure("~/Desktop/myFile.aep").then((c) =>
+  console.log(JSON.stringify(c, null, 2))
+);
+
 module.exports = { getProjectStructure };
