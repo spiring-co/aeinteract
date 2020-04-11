@@ -31,23 +31,18 @@ const getProjectStructure = (filePath) =>
         ).each((x) => {
           const item = {};
           if (x.source && x.source.constructor === CompItem) {
-            console.log("This is composition");
             comps[x.name] = getCompStructure(x.name);
           } else {
             if (x.constructor === AVLayer) {
-              console.log("This is AV Layer");
               if (x.source.mainSource.isStill) {
-                console.log("This is Image");
                 item["name"] = x.name.trim();
                 item["height"] = x.height;
                 item["width"] = x.width;
                 imageLayers.push(item);
               } else {
-                console.log("This is Video");
+                //handle video file here
               }
-              console.log(x.name);
             } else if (x.constructor === TextLayer) {
-              console.log("This is TextLayer");
               const item = {};
               item["name"] = x.name.trim();
               item["text"] = x.property("Source Text").value.text.trim();
