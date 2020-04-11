@@ -66,8 +66,4 @@ const getProjectStructure = (filePath) =>
     }, filePath)
     .catch(console.error);
 
-const x = getProjectStructure("~/Desktop/myFile.aep").then((c) =>
-  console.log(JSON.stringify(c, null, 2))
-);
-
 module.exports = { getProjectStructure };
