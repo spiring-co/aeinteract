@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const ae = require("./aeinteract");
 const { renderFromData } = require("./renderer");
@@ -17,6 +18,7 @@ const fileUploadConfig = {
   limits: { fileSize: 50 * 1024 * 1024 },
 };
 
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(fileUpload(fileUploadConfig));

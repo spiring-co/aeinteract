@@ -19,9 +19,11 @@ const getProjectStructure = (filePath) =>
       if (!(app.project.file && app.project.file.toString().includes(fp)))
         app.open(new File(fp));
 
-      const comps = [];
-      get(CompItem).each((x) => comps.push(x.name));
       function getCompStructure(compName) {
+        if (!compName) return;
+        // return if no comp with such name
+        if (!get(CompItem, compName).count()) return null;
+
         const textLayers = [];
         const imageLayers = [];
         const comps = {};
@@ -30,24 +32,28 @@ const getProjectStructure = (filePath) =>
           get(CompItem, compName).selection(0).layers
         ).each((x) => {
           const item = {};
-          if (x.source && x.source.constructor === CompItem) {
-            comps[x.name] = getCompStructure(x.name);
-          } else {
-            if (x.constructor === AVLayer) {
-              if (x.source.mainSource.isStill) {
+          if (x) {
+            if (x.source && x.source.constructor === CompItem) {
+              comps[x.name] = getCompStructure(x.name);
+            } else {
+              if (x.constructor === AVLayer) {
+                if (x.source.mainSource.isStill) {
+                  item["name"] = x.name.trim();
+                  item["height"] = x.height;
+                  item["width"] = x.width;
+                  imageLayers.push(item);
+                } else {
+                  //handle video file here
+                }
+              } else if (x.constructor === TextLayer) {
+                const item = {};
+                console.log(x.name);
+                // const t = x.property("Source Text").value.text;
                 item["name"] = x.name.trim();
-                item["height"] = x.height;
-                item["width"] = x.width;
-                imageLayers.push(item);
-              } else {
-                //handle video file here
+                // item["text"] = t.toString().trim();
+                item["font"] = x.property("Source Text").value.font;
+                textLayers.push(item);
               }
-            } else if (x.constructor === TextLayer) {
-              const item = {};
-              item["name"] = x.name.trim();
-              item["text"] = x.property("Source Text").value.text.trim();
-              item["font"] = x.property("Source Text").value.font;
-              textLayers.push(item);
             }
           }
         });
@@ -58,6 +64,9 @@ const getProjectStructure = (filePath) =>
       app.purge(PurgeTarget.ALL_CACHES);
 
       result = {};
+
+      const comps = [];
+      get(CompItem).each((x) => comps.push(x.name));
       comps.map((c) => {
         result[c] = getCompStructure(c);
       });
@@ -65,5 +74,7 @@ const getProjectStructure = (filePath) =>
       return result;
     }, filePath)
     .catch(console.error);
-
+// getProjectStructure("./public/templates/cute_animated.aep").then((data) =>
+// console.log(JSON.stringify(data, null, 2))
+// );
 module.exports = { getProjectStructure };
