@@ -27,7 +27,7 @@ async function renderFromData({ data, composition, templateFilePath }) {
   };
 
   const job = {
-    template: { src: templateFilePath, composition },
+    template: { src: templateFilePath, composition, continueOnMissing: true },
     assets,
     actions,
     onRenderProgress: (j, progress) => console.log(progress),

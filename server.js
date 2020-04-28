@@ -49,7 +49,8 @@ app.post("/getStructureFromFile", async (req, res, next) => {
 
 app.post("/render", async (req, res) => {
   if (!req.body) return res.status(400).json({ message: "No body provided" });
-  renderFromData(req.body);
+  console.log(req.body);
+  renderFromData(req.body).catch(console.error);
   res.json({ message: "Rendering job." });
 });
 
