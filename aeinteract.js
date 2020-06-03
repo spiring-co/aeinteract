@@ -1,4 +1,5 @@
 const ae = require("after-effects");
+const path = require("path");
 ae.options.errorHandling = true;
 ae.options.minify = false;
 ae.options.includes = [
@@ -38,7 +39,7 @@ const getProjectStructure = (filePath) =>
             } else {
               if (x.constructor === AVLayer) {
                 if (x.source.mainSource.isStill) {
-                  item["name"] = x.name.trim();
+                  item["name"] = new String(x.name);
                   item["height"] = x.height;
                   item["width"] = x.width;
                   imageLayers.push(item);
@@ -47,9 +48,11 @@ const getProjectStructure = (filePath) =>
                 }
               } else if (x.constructor === TextLayer) {
                 const item = {};
-                console.log(x.name);
+                console.log(new String(x.index));
+                console.log(new String(x.name));
+                item["index"] = x.index;
                 // const t = x.property("Source Text").value.text;
-                item["name"] = x.name.trim();
+                item["name"] = new String(x.name);
                 // item["text"] = t.toString().trim();
                 item["font"] = x.property("Source Text").value.font;
                 textLayers.push(item);
@@ -70,9 +73,8 @@ const getProjectStructure = (filePath) =>
       comps.map((c) => {
         result[c] = getCompStructure(c);
       });
-
       return result;
-    }, filePath)
+    }, path.resolve(filePath))
     .catch(console.error);
 // getProjectStructure("./public/templates/cute_animated.aep").then((data) =>
 // console.log(JSON.stringify(data, null, 2))
