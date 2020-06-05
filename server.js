@@ -16,7 +16,7 @@ app.post("/", fileHandler.single("file"), async (req, res, next) => {
       `templates/test2.aep`,
       readFileSync(req.file.path)
     );
-    return res.json({ data, url });
+    return res.json({ data, fileUrl: url });
   } catch (err) {
     next(err);
   }
