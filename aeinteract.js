@@ -56,8 +56,6 @@ const getProjectStructure = (filePath) =>
                 }
               } else if (x.constructor === TextLayer) {
                 const item = {};
-                console.log(new String(x.index));
-                console.log(new String(x.name));
                 item["index"] = x.index;
                 // const t = x.property("Source Text").value.text;
                 item["name"] = new String(x.name);
@@ -84,7 +82,4 @@ const getProjectStructure = (filePath) =>
       return { compositions: result, staticAssets };
     }, path.resolve(filePath))
     .catch(console.error);
-getProjectStructure("./sandbox/textProject.aep").then((data) =>
-  console.log(JSON.stringify(data, null, 2))
-);
 module.exports = { getProjectStructure };
