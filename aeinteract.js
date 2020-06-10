@@ -20,6 +20,13 @@ const getProjectStructure = (filePath) =>
       if (!(app.project.file && app.project.file.toString().includes(fp)))
         app.open(new File(fp));
 
+      const staticAssets = [];
+
+      get([FootageItem]).each((x) => {
+        if (x.mainSource.missingFootagePath)
+          staticAssets.push(x.mainSource.missingFootagePath);
+      });
+
       function getCompStructure(compName) {
         if (!compName) return;
         // return if no comp with such name
@@ -28,6 +35,7 @@ const getProjectStructure = (filePath) =>
         const textLayers = [];
         const imageLayers = [];
         const comps = {};
+
         get(
           [AVLayer, TextLayer],
           get(CompItem, compName).selection(0).layers
@@ -73,10 +81,10 @@ const getProjectStructure = (filePath) =>
       comps.map((c) => {
         result[c] = getCompStructure(c);
       });
-      return result;
+      return { compositions: result, staticAssets };
     }, path.resolve(filePath))
     .catch(console.error);
-// getProjectStructure("./public/templates/cute_animated.aep").then((data) =>
-// console.log(JSON.stringify(data, null, 2))
-// );
+getProjectStructure("./sandbox/textProject.aep").then((data) =>
+  console.log(JSON.stringify(data, null, 2))
+);
 module.exports = { getProjectStructure };
