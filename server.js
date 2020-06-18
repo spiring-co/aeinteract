@@ -2,14 +2,26 @@ const PORT = 4488;
 const path = require("path");
 const cors = require("cors");
 const app = require("express")();
+const bodyParser = require("body-parser");
+const https = require("https");
+const fs = require("fs");
 const ae = require("./aeinteract");
-const fileHandler = require("./helpers/fileHandler");
 
+app.use(bodyParser.json());
 app.use(cors());
-app.post("/", fileHandler.single("file"), async (req, res, next) => {
+
+app.post("/", async (req, res, next) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "File missing" });
-    return res.json(await ae.getProjectStructure(req.file.path));
+    const { fileUrl } = req.body;
+    const type = path.basename(fileUrl).split(".").pop();
+    if (!["aep", "aepx"].includes(type))
+      return res.status(400).json({ message: "Invalid file type" });
+
+    const file = fs.createWriteStream(`temp/${Date.now()}.${type}`);
+    const request = https.get(fileUrl, async function (response) {
+      response.pipe(file);
+      return res.json(await ae.getProjectStructure(file.path));
+    });
   } catch (err) {
     console.log(err);
     next(err);
