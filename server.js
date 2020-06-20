@@ -13,6 +13,8 @@ app.use(cors());
 app.post("/", async (req, res, next) => {
   try {
     const { fileUrl } = req.body;
+    if (!fileUrl) return res.status(400).json({ message: "no file provided" });
+    console.log(req.body);
     const type = path.basename(fileUrl).split(".").pop();
     if (!["aep", "aepx"].includes(type))
       return res.status(400).json({ message: "Invalid file type" });

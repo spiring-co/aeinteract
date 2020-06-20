@@ -26,6 +26,6 @@ coverage
 # Benchmarking
 benchmarks/graphs
 
-tmp
+tmp/
 public
 sandbox/
