@@ -6,6 +6,7 @@ ae.options.includes = [
   "./node_modules/after-effects/lib/includes/console.jsx",
   "./node_modules/after-effects/lib/includes/es5-shim.jsx",
   "./node_modules/after-effects/lib/includes/get.jsx",
+  "./es6-shims.jsx",
 ];
 
 // ae.options.program = path.join('OtherAppDirectory','Adobe After Effects 2015');
@@ -23,7 +24,10 @@ const getProjectStructure = (filePath) =>
       const staticAssets = [];
 
       get([FootageItem]).each((x) => {
-        if (x.mainSource.missingFootagePath)
+        if (
+          x.mainSource.missingFootagePath &&
+          !staticAssets.includes(x.mainSource.missingFootagePath)
+        )
           staticAssets.push(x.mainSource.missingFootagePath);
       });
 
