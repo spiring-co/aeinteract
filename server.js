@@ -22,7 +22,11 @@ app.post("/", async (req, res, next) => {
     const file = fs.createWriteStream(`temp/${Date.now()}.${type}`);
     const request = https.get(fileUrl, async function (response) {
       response.pipe(file);
-      return res.json(await ae.getProjectStructure(file.path));
+      try {
+        return res.json(await ae.getProjectStructure(file.path));
+      } catch (err) {
+        throw new Error(err);
+      }
     });
   } catch (err) {
     console.log(err);

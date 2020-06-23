@@ -61,9 +61,8 @@ const getProjectStructure = (filePath) =>
               } else if (x.constructor === TextLayer) {
                 const item = {};
                 item["index"] = x.index;
-                // const t = x.property("Source Text").value.text;
                 item["name"] = new String(x.name);
-                // item["text"] = t.toString().trim();
+                item["text"] = new String(x.property("Source Text").value);
                 item["font"] = x.property("Source Text").value.font;
                 textLayers.push(item);
               }
