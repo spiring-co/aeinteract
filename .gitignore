@@ -27,5 +27,6 @@ coverage
 benchmarks/graphs
 
 tmp/
+temp/
 public
 sandbox/
