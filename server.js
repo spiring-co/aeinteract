@@ -6,6 +6,11 @@ const bodyParser = require("body-parser");
 const https = require("https");
 const fs = require("fs");
 const ae = require("./aeinteract");
+const aeDir = "./temp";
+
+if (!fs.existsSync(aeDir)) {
+  fs.mkdirSync(aeDir);
+}
 
 app.use(bodyParser.json());
 app.use(cors());
