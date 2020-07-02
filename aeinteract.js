@@ -70,6 +70,7 @@ const getProjectStructure = (filePath) =>
                 item["name"] = new String(x.name);
                 item["height"] = x.height;
                 item["width"] = x.width;
+                item["extension"] = new String(x.source.file).split(".").pop();
                 imageLayers.push(item);
               } else {
                 //handle video file here
