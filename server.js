@@ -24,12 +24,14 @@ app.post("/", (req, res, next) => {
     if (!["aep", "aepx"].includes(type))
       return res.status(400).json({ message: "Invalid file type" });
 
-    const file = fs.createWriteStream(`temp/${Date.now()}.${type}`);
+    const filename = `${Date.now()}.${type}`;
+    const file = fs.createWriteStream(`temp/${filename}`);
 
     https.get(fileUrl, function (response) {
       response.pipe(file);
       ae.getProjectStructure(file.path)
         .then((output) => {
+          fs.unlinkSync(`./temp/${filename}`);
           return res.json(output);
         })
         .catch(next);
