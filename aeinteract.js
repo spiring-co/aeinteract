@@ -33,14 +33,15 @@ const getProjectStructure = (filePath) =>
     console.log(app.project.numItems + "items in this project.");
 
     var comps = {};
+    var compMapping = {};
 
-    var getCompStructure = function (id, name) {
+    var getCompStructure = function (id) {
       if (!id) return;
 
       var comp = app.project.itemByID(id);
-      if (!comp) return;
 
-      if (comps.hasOwnProperty(name)) return comps[name];
+      if (!comp) return;
+      if (comps.hasOwnProperty(id)) return comps[id];
 
       var structure = { textLayers: [], imageLayers: [], comps: {} };
 
@@ -51,8 +52,7 @@ const getProjectStructure = (filePath) =>
           if (layer.property("sourceText") === null) {
             if (layer.source instanceof CompItem) {
               structure.comps[layer.source.id] = getCompStructure(
-                layer.source.id,
-                layer.name
+                layer.source.id
               );
             }
           }
@@ -79,7 +79,7 @@ const getProjectStructure = (filePath) =>
           structure["textLayers"].push(tl);
         }
       }
-      comps[name] = structure;
+      comps[id] = structure;
     };
 
     var staticAssets = [];
@@ -97,10 +97,11 @@ const getProjectStructure = (filePath) =>
             staticAssets.push(new String(item.mainSource.file));
           break;
         case "Composition":
-          getCompStructure(item.id, item.name);
+          compMapping[item.id] = item.name;
+          getCompStructure(item.id);
           break;
       }
     }
-    return { compositions: comps, staticAssets };
+    return { compositions: comps, staticAssets, compMapping };
   }, path.resolve(filePath));
 module.exports = { getProjectStructure };
