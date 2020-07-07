@@ -12,94 +12,95 @@ ae.options.includes = [
 /**
  * @param  {String} filePath - path of aep or aepx file
  */
-
 const getProjectStructure = (filePath) =>
   ae.execute((fp) => {
-    console.log(
-      "You are:" + system.userName + "running on" + system.machineName + "."
-    );
-    console.log(app.isRenderEngine);
     app.saveProjectOnCrash = false;
-    // don't open file if already loaded
-    app.beginSuppressDialogs();
-    var fileToOpen = new File(fp);
-    console.log(fp);
-    if (fileToOpen.exists) {
-      new_project = app.open(fileToOpen);
-      if (new_project) {
-        // console.log(new_project.file.name);
-      } else {
-        throw new Error("Failed to open file");
-      }
-    }
-
-    app.setSavePreferencesOnQuit(false);
     app.activate();
-    console.log(app.project.file);
+    app.onError = console.log;
+    // app.project.expressionEngine ='extendscript';
+    app.beginSuppressDialogs();
+    app.purge(PurgeTarget.ALL_CACHES);
+    app.setSavePreferencesOnQuit(false);
+    app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
+    console.log("user: " + system.userName + " machine: " + system.machineName);
 
-    const staticAssets = [];
+    var fileToOpen = new File(fp);
+    console.log(fileToOpen);
+    if (!fileToOpen.exists) throw new Error("File does not exist");
+    if (!app.open(fileToOpen)) throw new Error("Failed to open file");
 
-    get([FootageItem]).each((x) => {
-      if (
-        x.mainSource.missingFootagePath &&
-        !staticAssets.includes(x.mainSource.missingFootagePath)
-      )
-        staticAssets.push(x.mainSource.missingFootagePath);
-    });
+    // log project info
+    console.log(app.project.numItems + "items in this project.");
 
-    function getCompStructure(compName) {
-      if (!compName) return;
-      // return if no comp with such name
-      if (!get(CompItem, compName).count()) return null;
+    var comps = {};
 
-      const textLayers = [];
-      const imageLayers = [];
-      const comps = {};
+    var getCompStructure = function (id, name) {
+      if (!id) return;
 
-      get(
-        [AVLayer, TextLayer],
-        get(CompItem, compName).selection(0).layers
-      ).each((x) => {
-        const item = {};
-        if (x) {
-          if (x.source && x.source.constructor === CompItem) {
-            comps[x.name] = getCompStructure(x.name);
-          } else {
-            if (x.constructor === AVLayer) {
-              if (x.source.mainSource.isStill) {
-                item["name"] = new String(x.name);
-                item["height"] = x.height;
-                item["width"] = x.width;
-                item["extension"] = new String(x.source.file).split(".").pop();
-                imageLayers.push(item);
-              } else {
-                //handle video file here
-              }
-            } else if (x.constructor === TextLayer) {
-              const item = {};
-              item["index"] = x.index;
-              item["name"] = new String(x.name);
-              item["text"] = new String(x.property("Source Text").value);
-              item["font"] = x.property("Source Text").value.font;
-              textLayers.push(item);
+      var comp = app.project.itemByID(id);
+      if (!comp) return;
+
+      if (comps.hasOwnProperty(name)) return comps[name];
+
+      var structure = { textLayers: [], imageLayers: [], comps: {} };
+
+      for (var j = 1; j < comp.layers.length + 1; j++) {
+        var layer = comp.layers[j];
+
+        if (layer instanceof AVLayer) {
+          if (layer.property("sourceText") === null) {
+            if (layer.source instanceof CompItem) {
+              structure.comps[layer.source.id] = getCompStructure(
+                layer.source.id,
+                layer.name
+              );
+            }
+          }
+          if (layer.source instanceof FootageItem) {
+            if (layer.source.mainSource && layer.source.mainSource.isStill) {
+              // AV Layer is placeholder
+              var il = {};
+              il["index"] = layer.index;
+              il["name"] = new String(layer.name);
+              il["height"] = layer.height;
+              il["width"] = layer.width;
+              il["extension"] = new String(layer.source.file).split(".").pop();
+              structure["imageLayers"].push(il);
             }
           }
         }
-      });
-      return { textLayers, imageLayers, comps };
+
+        if (layer.property("sourceText") !== null) {
+          var tl = {};
+          tl["index"] = layer.index;
+          tl["name"] = new String(layer.name);
+          tl["text"] = new String(layer.property("Source Text").value);
+          tl["font"] = layer.property("Source Text").value.font;
+          structure["textLayers"].push(tl);
+        }
+      }
+      comps[name] = structure;
+    };
+
+    var staticAssets = [];
+    for (var i = 1; i < app.project.numItems + 1; i++) {
+      var item = app.project.items[i];
+      switch (item.typeName) {
+        case "Folder":
+          break;
+        case "Footage":
+          if (
+            item.mainSource &&
+            item.mainSource.missingFootagePath &&
+            !staticAssets.includes(item.mainSource.missingFootagePath)
+          )
+            staticAssets.push(item.mainSource.missingFootagePath);
+          break;
+        case "Composition":
+          getCompStructure(item.id, item.name);
+          break;
+      }
     }
-
-    //purge memory
-    app.purge(PurgeTarget.ALL_CACHES);
-
-    result = {};
-
-    const comps = [];
-    get(CompItem).each((x) => comps.push(x.name));
-    comps.map((c) => {
-      result[c] = getCompStructure(c);
-    });
-    app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
-    return { compositions: result, staticAssets };
+    return { composition: comps, staticAssets };
   }, path.resolve(filePath));
 module.exports = { getProjectStructure };

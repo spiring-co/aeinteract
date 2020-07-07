@@ -34,7 +34,10 @@ app.post("/", (req, res, next) => {
           fs.unlinkSync(`./temp/${filename}`);
           return res.json(output);
         })
-        .catch(next);
+        .catch((err) => {
+          console.log(err);
+          next(err);
+        });
     });
   } catch (err) {
     console.log(err);
