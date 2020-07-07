@@ -79,7 +79,7 @@ const getProjectStructure = (filePath) =>
           structure["textLayers"].push(tl);
         }
       }
-      comps[id] = structure;
+      return structure;
     };
 
     var staticAssets = [];
@@ -98,7 +98,7 @@ const getProjectStructure = (filePath) =>
           break;
         case "Composition":
           compMapping[item.id] = item.name;
-          getCompStructure(item.id);
+          comps[item.id] = getCompStructure(item.id);
           break;
       }
     }
