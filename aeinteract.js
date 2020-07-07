@@ -101,6 +101,6 @@ const getProjectStructure = (filePath) =>
           break;
       }
     }
-    return { composition: comps, staticAssets };
+    return { compositions: comps, staticAssets };
   }, path.resolve(filePath));
 module.exports = { getProjectStructure };
