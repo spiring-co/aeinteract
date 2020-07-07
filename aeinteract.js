@@ -70,7 +70,7 @@ const getProjectStructure = (filePath) =>
           }
         }
 
-        if (layer.property("sourceText") !== null) {
+        if (layer instanceof TextLayer) {
           var tl = {};
           tl["index"] = layer.index;
           tl["name"] = new String(layer.name);
@@ -83,7 +83,7 @@ const getProjectStructure = (filePath) =>
     };
 
     var staticAssets = [];
-    for (var i = 1; i < app.project.numItems + 1; i++) {
+    for (var i = app.project.numItems; i > 0; i--) {
       var item = app.project.items[i];
       switch (item.typeName) {
         case "Folder":
@@ -91,10 +91,10 @@ const getProjectStructure = (filePath) =>
         case "Footage":
           if (
             item.mainSource &&
-            item.mainSource.missingFootagePath &&
-            !staticAssets.includes(item.mainSource.missingFootagePath)
+            item.mainSource.file &&
+            !staticAssets.includes(item.mainSource.file)
           )
-            staticAssets.push(item.mainSource.missingFootagePath);
+            staticAssets.push(new String(item.mainSource.file));
           break;
         case "Composition":
           getCompStructure(item.id, item.name);
