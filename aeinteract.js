@@ -116,7 +116,10 @@ const getProjectStructure = async (filePath) => {
   Object.keys(output["compositions"]).map((k) => {
     c[output.compMapping[k]] = output["compositions"][k];
   });
-  return { compositions: c, staticAssets: output.staticAssets };
+  return {
+    compositions: c,
+    staticAssets: Array.from(output.staticAssets),
+  };
 };
 
 module.exports = { getProjectStructure };
