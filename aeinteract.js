@@ -89,12 +89,9 @@ const getProjectStructure = async (filePath) => {
         case "Folder":
           break;
         case "Footage":
-          if (
-            item.mainSource &&
-            item.mainSource.file &&
-            !staticAssets.includes(item.mainSource.file)
-          )
-            staticAssets.push(new String(item.mainSource.file));
+          if (item.mainSource && item.mainSource.file) {
+            staticAssets.push(item.mainSource.file.fsName);
+          }
           break;
         case "Composition":
           compMapping[item.id] = item.name;
