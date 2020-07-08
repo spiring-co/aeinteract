@@ -32,6 +32,7 @@ app.post("/", (req, res, next) => {
       ae.getProjectStructure(file.path)
         .then((output) => {
           fs.unlinkSync(`./temp/${filename}`);
+
           return res.json(output);
         })
         .catch((err) => {

@@ -12,8 +12,8 @@ ae.options.includes = [
 /**
  * @param  {String} filePath - path of aep or aepx file
  */
-const getProjectStructure = (filePath) =>
-  ae.execute((fp) => {
+const getProjectStructure = async (filePath) => {
+  const output = await ae.execute((fp) => {
     app.saveProjectOnCrash = false;
     app.activate();
     app.onError = console.log;
@@ -102,6 +102,21 @@ const getProjectStructure = (filePath) =>
           break;
       }
     }
+
     return { compositions: comps, staticAssets, compMapping };
   }, path.resolve(filePath));
+
+  // post processing
+  output["staticAssets"] = new Set(
+    output["staticAssets"].map((p) => path.basename(p.toString()))
+  );
+
+  const c = {};
+
+  Object.keys(output["compositions"]).map((k) => {
+    c[output.compMapping[k]] = output["compositions"][k];
+  });
+  return { compositions: c, staticAssets: output.staticAssets };
+};
+
 module.exports = { getProjectStructure };
