@@ -1,19 +1,24 @@
-const PORT = 4488;
+const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
+const https = require("https");
 const app = require("express")();
 const bodyParser = require("body-parser");
-const https = require("https");
-const fs = require("fs");
+
 const ae = require("./aeinteract");
 const aeDir = "./temp";
 
+const PORT = 3050;
+
+// create temp dir if not there
 if (!fs.existsSync(aeDir)) {
   fs.mkdirSync(aeDir);
 }
 
 app.use(bodyParser.json());
 app.use(cors());
+
+app.get("/", (req, res) => res.send("OKa"));
 
 app.post("/", (req, res, next) => {
   try {
@@ -29,9 +34,10 @@ app.post("/", (req, res, next) => {
 
     https.get(fileUrl, function (response) {
       response.pipe(file);
+      console.log(file.path);
       ae.getProjectStructure(file.path)
         .then((output) => {
-          fs.unlinkSync(`./temp/${filename}`);
+          // fs.unlinkSync(`./temp/${filename}`);
 
           return res.json(output);
         })

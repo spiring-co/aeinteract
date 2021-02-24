@@ -1,12 +1,13 @@
 const ae = require("after-effects");
 const path = require("path");
-ae.options.errorHandling = true;
-ae.options.minify = false;
+
+// ae.options.errorHandling = true;
+// ae.options.minify = false;
 ae.options.includes = [
-  "./node_modules/after-effects/lib/includes/console.jsx",
-  "./node_modules/after-effects/lib/includes/es5-shim.jsx",
-  "./node_modules/after-effects/lib/includes/get.jsx",
-  "./es6-shims.jsx",
+  // "./node_modules/after-effects/lib/includes/console.jsx",
+  // "./node_modules/after-effects/lib/includes/es5-shim.jsx",
+  // "./node_modules/after-effects/lib/includes/get.jsx",
+  // "./es6-shims.jsx",
 ];
 
 /**
@@ -14,23 +15,8 @@ ae.options.includes = [
  */
 const getProjectStructure = async (filePath) => {
   const output = await ae.execute((fp) => {
-    app.saveProjectOnCrash = false;
-    app.activate();
-    app.onError = console.log;
-    // app.project.expressionEngine ='extendscript';
-    app.beginSuppressDialogs();
-    app.purge(PurgeTarget.ALL_CACHES);
-    app.setSavePreferencesOnQuit(false);
-    app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);
-    console.log("user: " + system.userName + " machine: " + system.machineName);
-
     var fileToOpen = new File(fp);
-    console.log(fileToOpen);
-    if (!fileToOpen.exists) throw new Error("File does not exist");
-    if (!app.open(fileToOpen)) throw new Error("Failed to open file");
-
-    // log project info
-    console.log(app.project.numItems + "items in this project.");
+    app.open(fileToOpen);
 
     var comps = {};
     var compMapping = {};
@@ -112,6 +98,10 @@ const getProjectStructure = async (filePath) => {
 
   Object.keys(output["compositions"]).map((k) => {
     c[output.compMapping[k]] = output["compositions"][k];
+  });
+
+  await ae.execute(() => {
+    app.quit();
   });
   return {
     compositions: c,
