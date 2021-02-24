@@ -953,10 +953,10 @@ events@1.1.1:
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
   integrity sha1-nr23Y1rQmccNzEwqH1AEKI6L2SQ=
 
-express-fileupload@^1.1.7-alpha.2:
-  version "1.1.7-alpha.2"
-  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.1.7-alpha.2.tgz#dca32c28683429b3ddccb02ac0ef8db0cb94485c"
-  integrity sha512-3D7ZnC7CkWzNGZg0NwNc1alB8ZUJiaqm13zgVgx0t5fKc/ovEJnsClKzLZdLkPQVN/YKm3O/T5gkdmk5r2jzcA==
+express-fileupload@^1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.1.10.tgz#c4a223b2020e5175498ab684566fc430ec9c8b15"
+  integrity sha512-VEbeJBMDl+N+I/vXjQ17Xg+R35El6l6n/EELcSSpnwQbjqFmtAfXY9p5NpBpto5FqnksIleYImJ1jNlIWlP2aw==
   dependencies:
     busboy "^0.3.1"
 
