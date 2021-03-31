@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 const ae = require("./aeinteract");
 const aeDir = "./temp";
 
-const PORT = 3050;
+const PORT = 80;
 
 // create temp dir if not there
 if (!fs.existsSync(aeDir)) {
